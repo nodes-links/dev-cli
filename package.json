@@ -1,5 +1,5 @@
 {
-  "name": "@oclif/dev-cli",
+  "name": "@nodes-links/dev-cli",
   "description": "helpers for oclif CLIs",
   "version": "1.22.2",
   "author": "Jeff Dickey @jdxcode",
@@ -52,7 +52,7 @@
     "/bin",
     "/lib"
   ],
-  "homepage": "https://github.com/oclif/dev-cli",
+  "homepage": "https://github.com/nodes-links/dev-cli",
   "keywords": [
     "oclif"
   ],

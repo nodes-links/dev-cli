@@ -25,11 +25,16 @@ exit $ret
 `,
   nsis: (config: Config.IConfig, arch: string) => `!include MUI2.nsh
 
+!define MUI_ICON ".\\client\\lib\\assets\\company-logo.ico"
+
+!define MUI_WELCOMEFINISHPAGE_BITMAP ".\\client\\lib\\assets\\nsis-welcome.bmp"
+
 !define Version '${config.version.split('-')[0]}'
-Name "${config.name}"
+Name "${config.name} CLI"
 CRCCheck On
 InstallDirRegKey HKCU "Software\\${config.name}" ""
 
+!insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
@@ -41,9 +46,9 @@ InstallDirRegKey HKCU "Software\\${config.name}" ""
 
 OutFile "installer.exe"
 VIProductVersion "\${VERSION}.0"
-VIAddVersionKey /LANG=\${LANG_ENGLISH} "ProductName" "${config.name}"
+VIAddVersionKey /LANG=\${LANG_ENGLISH} "ProductName" "${config.name} CLI"
 VIAddVersionKey /LANG=\${LANG_ENGLISH} "Comments" "${config.pjson.homepage}"
-VIAddVersionKey /LANG=\${LANG_ENGLISH} "CompanyName" "${config.scopedEnvVar('AUTHOR') || config.pjson.author}"
+VIAddVersionKey /LANG=\${LANG_ENGLISH} "CompanyName" "${config.scopedEnvVar('AUTHOR') || config.pjson.author.name}"
 VIAddVersionKey /LANG=\${LANG_ENGLISH} "LegalCopyright" "${new Date().getFullYear()}"
 VIAddVersionKey /LANG=\${LANG_ENGLISH} "FileDescription" "${config.pjson.description}"
 VIAddVersionKey /LANG=\${LANG_ENGLISH} "FileVersion" "\${VERSION}.0"
@@ -60,11 +65,11 @@ Section "${config.name} CLI \${VERSION}"
   WriteRegStr HKCU "Software\\${config.dirname}" "" $INSTDIR
   WriteUninstaller "$INSTDIR\\Uninstall.exe"
   WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${config.dirname}" \\
-                   "DisplayName" "${config.name}"
+                   "DisplayName" "${config.name} LTD"
   WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${config.dirname}" \\
                    "UninstallString" "$\\"$INSTDIR\\uninstall.exe$\\""
   WriteRegStr HKLM "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${config.dirname}" \\
-                   "Publisher" "${config.scopedEnvVar('AUTHOR') || config.pjson.author}"
+                   "Publisher" "${config.scopedEnvVar('AUTHOR') || config.pjson.author.name}"
 SectionEnd
 
 Section "Set PATH to ${config.name}"
@@ -202,6 +207,10 @@ export default class PackWin extends Command {
     const {flags} = this.parse(PackWin)
     const buildConfig = await Tarballs.buildConfig(flags.root)
     const {config} = buildConfig
+
+    config.name = "Nodes & Links"
+    config.dirname = "NodesLinks\\nl-cli"
+
     await Tarballs.build(buildConfig, {platform: 'win32', pack: false})
     const arches = buildConfig.targets.filter(t => t.platform === 'win32').map(t => t.arch)
     for (const arch of arches) {
